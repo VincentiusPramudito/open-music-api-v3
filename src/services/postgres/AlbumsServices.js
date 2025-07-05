@@ -31,7 +31,7 @@ class AlbumsService {
 
   async getAlbumById(id) {
     const queryAlbum = {
-      text: 'SELECT id, name, year FROM albums WHERE id = $1',
+      text: 'SELECT id, name, year, cover_url FROM albums WHERE id = $1',
       values: [id]
     };
 
@@ -64,7 +64,7 @@ class AlbumsService {
 
     const result = await this._pool.query(query);
     if (!result.rows.length) {
-      throw new NotFoundError('Failed to updat album. Cannot find album.');
+      throw new NotFoundError('Failed to update album. Cannot find album.');
     }
   }
 
@@ -77,6 +77,18 @@ class AlbumsService {
     const result = await this._pool.query(query);
     if (!result.rows.length) {
       throw new NotFoundError('Failed to delete album. Cannot find album.');
+    }
+  }
+
+  async addCoverUrlToAlbumById(id, coverUrl) {
+    const query = {
+      text: 'UPDATE albums SET cover_url = $1 WHERE id = $2 RETURNING id',
+      values: [coverUrl, id]
+    };
+
+    const result = await this._pool.query(query);
+    if (!result.rows.length) {
+      throw new NotFoundError('Failed to add cover album"s url.');
     }
   }
 }

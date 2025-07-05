@@ -19,15 +19,17 @@ class AlbumsHandler {
     return response;
   };
 
-  getAlbumByIdHandler = async (request) => {
+  getAlbumByIdHandler = async (request, h) => {
     const { id } = request.params;
     const album = await this._service.getAlbumById(id);
-    return {
+    const response = h.response({
       status: 'success',
       data: {
         album
       }
-    };
+    });
+    response.code(200);
+    return response;
   };
 
   putAlbumByIdHandler = async (request) => {

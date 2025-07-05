@@ -4,9 +4,10 @@ const mapDBAlbumsColumnsToModel = ({
   name,
   year,
   songs,
+  cover_url,
   created_at,
   updated_at,
-}) => ({ id, name, year, songs, createdAt: created_at, updatedAt: updated_at });
+}) => ({ id, name, year, songs, coverUrl: cover_url, createdAt: created_at, updatedAt: updated_at });
 
 const mapDBSongsColumnsToModel = ({
   id,
