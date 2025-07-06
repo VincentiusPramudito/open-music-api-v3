@@ -3,8 +3,9 @@ const ConnectPool = require('./ConnectPool');
 const InvariantError = require('../../exceptions/InvariantError');
 
 class AlbumLikesService {
-  constructor() {
+  constructor(cacheService) {
     this._pool = ConnectPool();
+    this._cacheService = cacheService;
   }
 
   async addLikes({ albumId, userId }) {
@@ -18,6 +19,8 @@ class AlbumLikesService {
     if (!result.rows.length) {
       throw new InvariantError('Failed to like the album');
     }
+
+    await this._cacheService.delete(`album_likes_counter:${ albumId }`);
     return result.rows[0].id;
   }
 
@@ -31,16 +34,37 @@ class AlbumLikesService {
     if (!result.rows.length){
       throw new InvariantError('Failed to remove likes');
     }
+
+    await this._cacheService.delete(`album_likes_counter:${ albumId }`);
   }
 
   async getLikes({ albumId }) {
-    const query = {
-      text: 'SELECT COUNT(1) FROM album_likes WHERE album_id = $1',
-      values: [albumId]
-    };
+    try {
+      const result = JSON.parse(await this._cacheService.get(`album_likes_counter:${ albumId }`));
 
-    const result = await this._pool.query(query);
-    return Number(result.rows[0].count);
+      const obj = {
+        source: 'REDIS',
+        data: parseInt(result)
+      };
+      return obj;
+
+    } catch (error) {
+      console.log(error);
+
+      const query = {
+        text: 'SELECT COUNT(1) FROM album_likes WHERE album_id = $1',
+        values: [albumId]
+      };
+
+      const result = await this._pool.query(query);
+      await this._cacheService.set(`album_likes_counter:${ albumId }`, JSON.stringify(result.rows[0].count));
+
+      const obj = {
+        source: 'DATABASE',
+        data: parseInt(result.rows[0].count)
+      };
+      return obj;
+    }
   }
 
   async verifyAlbumLiked({ albumId, userId }) {

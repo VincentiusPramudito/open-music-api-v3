@@ -62,14 +62,18 @@ const AuthenticationValidator = require('./validators/authentications');
 const AuthenticationsService = require('./services/postgres/AuthenticationsServices');
 const TokenManager = require('./tokenize/TokenManager');
 
+// cache
+const CacheService = require('./services/redis/CacheService');
+
 const ClientError = require('./exceptions/ClientError');
 
 const init = async () => {
+  const cacheService = new CacheService();
   const albumsService = new AlbumsService();
   const songsService = new SongsService();
   const usersService = new UsersService();
   const collaborationsService = new CollaborationsService();
-  const albumLikesService = new AlbumLikesService();
+  const albumLikesService = new AlbumLikesService(cacheService);
   const playlistsService = new PlaylistsService(collaborationsService);
   const playlistSongsService = new PlaylistSongsService();
   const playlistSongActivitiesService = new PlaylistSongActivitiesService();

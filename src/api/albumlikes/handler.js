@@ -34,16 +34,27 @@ class AlbumLikesHandler {
     };
   };
 
-  getAlbumLikesHandler = async (request) => {
+  getAlbumLikesHandler = async (request, h) => {
     const { albumId } = request.params;
 
-    const likes = await this._service.getLikes({ albumId });
-    return {
-      status: 'success',
-      data: {
-        likes
-      }
-    };
+    const objResult = await this._service.getLikes({ albumId });
+    if (objResult.source == 'REDIS') {
+      const response = h.response({
+        status: 'success',
+        data: {
+          likes: objResult.data
+        }
+      });
+      response.header('X-Data-Source', 'cache');
+      return response;
+    } else {
+      return {
+        status: 'success',
+        data: {
+          likes: objResult.data
+        }
+      };
+    }
   };
 }
 
