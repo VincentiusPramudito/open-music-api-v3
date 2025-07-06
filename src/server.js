@@ -47,7 +47,7 @@ const ExportsValidator = require('./validators/exports');
 
 // Uploads
 const uploads = require('./api/uploads');
-const StorageServiceLocal = require('./services/storage/StorageService');
+// const StorageServiceLocal = require('./services/storage/StorageService');
 const StorageServiceAWS = require('./services/s3/StorageService');
 const UploadsValidator = require('./validators/uploads');
 
@@ -68,7 +68,7 @@ const init = async () => {
   const playlistSongsService = new PlaylistSongsService();
   const playlistSongActivitiesService = new PlaylistSongActivitiesService();
   const authenticationsService = new AuthenticationsService();
-  const storageServiceLocal = new StorageServiceLocal(path.resolve(__dirname, 'api/uploads/file/images'));
+  // const storageServiceLocal = new StorageServiceLocal(path.resolve(__dirname, 'api/uploads/file/images'));
   const storageServiceAWS = new StorageServiceAWS();
 
   const server = Hapi.server({
