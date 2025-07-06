@@ -3,7 +3,7 @@ require('dotenv').config();
 const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
 const Inert = require('@hapi/inert');
-const path = require('path');
+// const path = require('path');
 
 // Albums
 const album = require('./api/albums');
@@ -40,6 +40,11 @@ const collaboration = require('./api/collaborations');
 const CollaborationValidator = require('./validators/collaborations');
 const CollaborationsService = require('./services/postgres/CollaborationsServices');
 
+// Album Likes
+const albumLikes = require('./api/albumlikes');
+const AlbumLikesValidator = require('./validators/albumLikes');
+const AlbumLikesService = require('./services/postgres/AlbumLikesService');
+
 // Exports
 const _exports = require('./api/exports');
 const ProducerService = require('./services/rabbitmq/ProducerService');
@@ -64,6 +69,7 @@ const init = async () => {
   const songsService = new SongsService();
   const usersService = new UsersService();
   const collaborationsService = new CollaborationsService();
+  const albumLikesService = new AlbumLikesService();
   const playlistsService = new PlaylistsService(collaborationsService);
   const playlistSongsService = new PlaylistSongsService();
   const playlistSongActivitiesService = new PlaylistSongActivitiesService();
@@ -160,6 +166,14 @@ const init = async () => {
         playlistsService,
         usersService,
         validator: CollaborationValidator
+      }
+    },
+    {
+      plugin: albumLikes,
+      options: {
+        albumsService,
+        service: albumLikesService,
+        validator: AlbumLikesValidator
       }
     },
     {
